@@ -23,11 +23,18 @@ const expenseTrackerSchema = new mongoose.Schema(
     others: {
       type: Number,
     },
+    totalExpenses: {
+      type: Number,
+      required: true,
+    },
+    savings: {
+      type: Number,
+      required: true,
+    },
+    
   },
   { timeseriestamps: true }
 );
-
-
 
 const ExpenseTracker = mongoose.model("ExpenseTracker", expenseTrackerSchema);
 
