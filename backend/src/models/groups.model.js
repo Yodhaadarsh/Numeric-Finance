@@ -15,7 +15,19 @@ const GroupSchema = new mongoose.Schema({
     },
   ],
 
-  
+  expenses: [
+    {
+      expensesId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "ExpenseTracker",
+      },
+      userId:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      }
+    },
+  ],
+
 
 });
 

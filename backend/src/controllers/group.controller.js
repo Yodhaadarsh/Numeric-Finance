@@ -1,7 +1,6 @@
 const GroupModel = require("../models/groups.model");
 const userModel = require("../models/user.model");
 
-
 const groupController = async (req, res) => {
   const { name } = req.body;
 
@@ -76,13 +75,17 @@ const inviteMembersController = async (req, res) => {
     userToInvite.groups.push(group._id);
     await userToInvite.save();
 
-    res.json({ message: `${userToInvite.fullname} added to group ${group.name}` });
+    res.json({
+      message: `${userToInvite.fullname} added to group ${group.name}`,
+    });
   } catch (error) {
     return res
       .status(500)
       .json({ message: "Server Error", error: error.message });
   }
 };
+
+// for logged in user to get all groups
 
 const getUserGroupsController = async (req, res) => {
   try {
@@ -96,8 +99,30 @@ const getUserGroupsController = async (req, res) => {
   }
 };
 
+// for a group to get all members
+
+const getGroupMembersController = async (req, res) => {
+  const { groupId } = req.params;
+  try {
+    const group = await GroupModel.findById(groupId).populate(
+      "members.userId",
+      "fullname email"
+    );
+    if (!group) {
+      return res.status(404).json({ message: "Group not found" });
+    }
+
+    return res.status(200).json({ members: group.members });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Server Error", error: error.message });
+  }
+};
+
 module.exports = {
   groupController,
   inviteMembersController,
   getUserGroupsController,
+  getGroupMembersController,
 };

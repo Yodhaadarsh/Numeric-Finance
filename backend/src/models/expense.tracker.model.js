@@ -7,6 +7,10 @@ const expenseTrackerSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    groupId:{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Group",
+    },
     income: {
       type: Number,
       required: true,
@@ -31,6 +35,11 @@ const expenseTrackerSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    date:{
+      type: Date,
+       default: Date.now,
+      required: true,
+    }
     
   },
   { timeseriestamps: true }

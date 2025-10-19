@@ -1,20 +1,38 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const GroupModel = require('../models/groups.model');
-const authMiddleware = require('../middlewares/auth.middleware');
-const { groupController, inviteMembersController, getUserGroupsController } = require('../controllers/group.controller');
-
+const GroupModel = require("../models/groups.model");
+const authMiddleware = require("../middlewares/auth.middleware");
+const {
+  groupController,
+  inviteMembersController,
+  getUserGroupsController,
+  getGroupMembersController,
+} = require("../controllers/group.controller");
+const {
+  groupExpenseEntry,
+} = require("../controllers/expense.tracker.controller");
+const { sendMessageController, getGroupMessagesController } = require("../controllers/groupChat.controller");
 
 // Create a new group
-
-router.post("/create" , authMiddleware , groupController);
+router.post("/create", authMiddleware, groupController);
 
 // invite members to group
-
-router.post("/invite/:groupId" , authMiddleware , inviteMembersController);
+router.post("/invite/:groupId", authMiddleware, inviteMembersController);
 
 // get all groups of a user
+router.get("/all-groups", authMiddleware, getUserGroupsController);
 
-router.get("/all-groups" , authMiddleware ,  getUserGroupsController);
+// add group expense entry
+router.post("/expense/:groupId", authMiddleware, groupExpenseEntry);
+
+// to find the group members
+router.get("/members/:groupId", authMiddleware, getGroupMembersController);
+
+// for group chat messages
+router.post("/chat/:groupId" , authMiddleware , sendMessageController);
+
+// get group chat messages
+
+router.get("/chat/:groupId" , authMiddleware , getGroupMessagesController );
 
 module.exports = router;
