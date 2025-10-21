@@ -27,8 +27,9 @@ const ViewGroup = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
   const [typingUsers, setTypingUsers] = useState([]);
+  const [loadingMessages, setLoadingMessages] = useState(true);
 
-  // Join group on socket
+  // Join group via socket
   useEffect(() => {
     socket.emit("joinGroup", id);
 
@@ -41,7 +42,6 @@ const ViewGroup = () => {
         if (!prev.includes(user)) return [...prev, user];
         return prev;
       });
-      // Remove typing after 2 seconds
       setTimeout(() => {
         setTypingUsers((prev) => prev.filter((u) => u !== user));
       }, 2000);
@@ -54,13 +54,14 @@ const ViewGroup = () => {
     };
   }, [id]);
 
-  // Auto scroll on new messages
+  // Auto-scroll on new messages
   useEffect(() => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
   }, [messages]);
 
+  // Fetch group data
   const fetchGroupData = async () => {
     try {
       const res = await axios.get(`/group/group/${id}`);
@@ -71,6 +72,7 @@ const ViewGroup = () => {
     }
   };
 
+  // Fetch all users for "Add Member"
   const fetchAllUsers = async () => {
     try {
       const res = await axios.get("/auth/users");
@@ -80,14 +82,18 @@ const ViewGroup = () => {
     }
   };
 
+  // Load initial messages
   const getAllMessages = async () => {
     try {
+      setLoadingMessages(true);
       const res = await axios.get(`/group/chat/${id}`);
       if (res.data && res.data.messages) {
         setMessages(res.data.messages);
       }
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoadingMessages(false);
     }
   };
 
@@ -96,6 +102,7 @@ const ViewGroup = () => {
     getAllMessages();
   }, []);
 
+  // Send a message
   const sendMessage = () => {
     if (!message.trim()) return;
     const msgData = {
@@ -108,10 +115,12 @@ const ViewGroup = () => {
     setMessage("");
   };
 
+  // Typing indicator
   const handleTyping = () => {
     socket.emit("typing", { groupId: id, user: "You" });
   };
 
+  // Add member to group
   const addMemberToGroup = async (email) => {
     try {
       await axios.post(`/group/invite/${id}`, { email });
@@ -149,25 +158,33 @@ const ViewGroup = () => {
         ref={chatContainerRef}
         className="flex-1 overflow-y-auto p-5 space-y-4"
       >
-        {messages.map((msg, index) => (
-          <div
-            key={msg._id || index}
-            className={`flex ${
-              msg.sender.name === "You" ? "justify-end" : "justify-start"
-            }`}
-          >
+        {loadingMessages ? (
+          <div className="flex justify-center items-center h-full">
+            <div className="loader border-4 border-green-400 border-t-transparent rounded-full w-10 h-10 animate-spin"></div>
+          </div>
+        ) : messages.length === 0 ? (
+          <p className="text-gray-400 text-center">No messages yet.</p>
+        ) : (
+          messages.map((msg, index) => (
             <div
-              className={`p-3 max-w-sm rounded-2xl ${
-                msg.sender.name === "You"
-                  ? "bg-green-600 text-white"
-                  : "bg-gray-800 text-gray-300"
+              key={msg._id || index}
+              className={`flex ${
+                msg.sender.name === "You" ? "justify-end" : "justify-start"
               }`}
             >
-              <p className="text-sm font-semibold mb-1">{msg.sender.name}</p>
-              <p className="text-sm">{msg.message}</p>
+              <div
+                className={`p-3 max-w-sm rounded-2xl ${
+                  msg.sender.name === "You"
+                    ? "bg-green-600 text-white"
+                    : "bg-gray-800 text-gray-300"
+                }`}
+              >
+                <p className="text-sm font-semibold mb-1">{msg.sender.name}</p>
+                <p className="text-sm">{msg.message}</p>
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
 
         {/* Typing Indicator */}
         {typingUsers.length > 0 && (
@@ -198,7 +215,7 @@ const ViewGroup = () => {
         </button>
       </div>
 
-      {/* Drawer */}
+      {/* Drawer for group info */}
       <div
         className={`absolute top-0 right-0 h-full w-80 bg-gray-900 border-l border-gray-800 shadow-2xl transform transition-transform duration-300 ${
           isDrawerOpen ? "translate-x-0" : "translate-x-full"
@@ -213,20 +230,18 @@ const ViewGroup = () => {
             onClick={() => setIsDrawerOpen(false)}
           />
         </div>
-
         <div className="p-4 space-y-4 overflow-y-auto h-[calc(100%-4rem)]">
+          {/* Group Details */}
           <div className="bg-gray-800 rounded-lg p-3">
             <p className="text-sm text-gray-400 mb-1">Group Name</p>
             <p className="font-semibold text-white">{group?.name}</p>
           </div>
-
           <div className="bg-gray-800 rounded-lg p-3">
             <p className="text-sm text-gray-400 mb-1">Created By</p>
             <p className="font-semibold text-white">
               {group?.createdBy?.name || "Unknown"}
             </p>
           </div>
-
           <div className="bg-gray-800 rounded-lg p-3">
             <p className="text-sm text-gray-400 mb-1">Description</p>
             <p className="text-sm text-gray-300">
