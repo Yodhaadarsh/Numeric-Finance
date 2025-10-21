@@ -4,6 +4,9 @@ const { generateText, AiChat } = require("./ai.service");
 const jwt = require("jsonwebtoken");
 const userModel = require("../models/user.model");
 const ExpenseTracker = require("../models/expense.tracker.model");
+const {
+  sendMessageController,
+} = require("../controllers/groupChat.controller");
 
 // const userSocketMap = new Map();
 // let io;
@@ -51,28 +54,31 @@ const initSocketServer = async (httpServer) => {
       // const response = `Received your data: ${JSON.stringify(data)}`;
       const response = await generateText(`${JSON.stringify(data)}`);
 
-
       socket.emit("receive-data", response);
     });
 
-
-    socket.on("user-message" , async (data) => {
+    socket.on("user-message", async (data) => {
       console.log(`Data recieved from frontend : ${data}`);
-
 
       const response = await AiChat(data);
 
+      socket.emit("ai-message", response);
+    });
 
-      socket.emit("ai-message" ,  response);
+    socket.on("joinGroup", async (groupid) => {
+      socket.join(groupid);
+      console.log(`User joined group: ${groupid}`);
+    });
 
+    socket.on("sendMessage", async ({ id, message }) => {
+      await sendMessageController(socket.user._id, id, message, io);
 
-    })
+      //  console.log(socket.user._id , id , message , io);
+    });
 
     socket.on("disconnect", () => {
       console.log("🔴 User disconnected:", socket.id);
     });
-
-   
   });
 };
 

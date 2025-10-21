@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Plus, Search, X } from "lucide-react";
 import axios from "../config/axios.config";
+import {useNavigate} from 'react-router-dom'
 
 const GroupsPage = () => {
   const [groups, setGroups] = useState(null);
@@ -52,6 +53,13 @@ const GroupsPage = () => {
     group.name.toLowerCase().includes(search.toLowerCase())
   );
 
+
+  const navigate = useNavigate();
+
+  const handleNavigate = (id) => {
+    navigate(`/group/${id}`)
+  }
+
   return (
     <div className="min-h-screen w-full bg-gray-900 text-white">
       {/* Top Navbar */}
@@ -90,6 +98,7 @@ const GroupsPage = () => {
         ) : filteredGroups?.length > 0 ? (
           filteredGroups.map((group) => (
             <div
+            onClick={()=>handleNavigate(group._id)}
               key={group.id}
               className="bg-gray-800 p-4 rounded-xl shadow-md hover:shadow-lg cursor-pointer transition"
             >

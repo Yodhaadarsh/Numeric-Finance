@@ -5,6 +5,7 @@ const {
   updateProfileController,
   updatePasswordController,
   deleteUserController,
+  getAllUsersControllers,
 } = require("../controllers/auth.controller");
 const authMiddleware = require("../middlewares/auth.middleware");
 const userModel = require("../models/user.model");
@@ -38,5 +39,9 @@ router.get("/user", authMiddleware, async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 });
+
+// for get all users
+
+router.get("/users" , authMiddleware , getAllUsersControllers);
 
 module.exports = router;

@@ -191,10 +191,23 @@ const deleteUserController = async (req, res) => {
   }
 };
 
+
+const getAllUsersControllers = async(req , res) => {
+  try {
+    const users = await usermodel.find().select("-password");
+    res.status(200).json({
+      users
+    })
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 module.exports = {
   registerController,
   loginController,
   updateProfileController,
   updatePasswordController,
   deleteUserController,
+  getAllUsersControllers
 };

@@ -11,7 +11,11 @@ const {
 const {
   groupExpenseEntry,
 } = require("../controllers/expense.tracker.controller");
-const { sendMessageController, getGroupMessagesController } = require("../controllers/groupChat.controller");
+const {
+  sendMessageController,
+  getGroupMessagesController,
+  getGroupController,
+} = require("../controllers/groupChat.controller");
 
 // Create a new group
 router.post("/create", authMiddleware, groupController);
@@ -29,10 +33,14 @@ router.post("/expense/:groupId", authMiddleware, groupExpenseEntry);
 router.get("/members/:groupId", authMiddleware, getGroupMembersController);
 
 // for group chat messages
-router.post("/chat/:groupId" , authMiddleware , sendMessageController);
+router.post("/chat/:groupId", authMiddleware, sendMessageController);
 
 // get group chat messages
 
-router.get("/chat/:groupId" , authMiddleware , getGroupMessagesController );
+router.get("/chat/:groupId", authMiddleware, getGroupMessagesController);
+
+// to get a group
+
+router.get("/group/:id", authMiddleware, getGroupController);
 
 module.exports = router;

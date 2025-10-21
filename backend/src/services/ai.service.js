@@ -53,9 +53,10 @@ ${prompt}
 };
 
 const AiChat = async (prompt) => {
-  const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
-    contents: `You are Numeric Finance AI, developed by Prince for the Numeric Finance app. Your role is to assist users with questions related to personal finance, budgeting, expenses, investments, savings, loans, and financial planning.
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: `You are Numeric Finance AI, developed by Prince for the Numeric Finance app. Your role is to assist users with questions related to personal finance, budgeting, expenses, investments, savings, loans, and financial planning.
 
 Rules:
 
@@ -69,9 +70,20 @@ Rules:
    "Hello! I’m Numeric Finance AI, made by Prince. Ask me anything about your expenses, savings, or investments."
 
 ${prompt}  this is prompt  `,
-  });
+    });
 
-  return response.text;
+    return response.text;
+  } catch (error) {
+    console.error("AI Chat Error:", error.message || error);
+
+    // Handle specific Google GenAI overload case
+    if (error.status === 503 || error.code === 503) {
+      return "🚧 AI system is currently overloaded. Please try again in a few seconds.";
+    }
+
+    // Handle any other AI errors
+    return "⚠️ AI service is temporarily unavailable. Please try again later.";
+  }
 };
 
 module.exports = { generateText, AiChat };

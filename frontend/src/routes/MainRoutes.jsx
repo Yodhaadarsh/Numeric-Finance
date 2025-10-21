@@ -7,6 +7,7 @@ import Profile from '../pages/Profile'
 import GroupPage from '../pages/Group'
 import AIChatPage from '../pages/AI-Chat'
 import CreateExpense from '../pages/GenerateExpense'
+import ViewGroup from '../pages/ViewGroup'
 
 const MainRoutes = () => {
   return (
@@ -19,6 +20,8 @@ const MainRoutes = () => {
       <Route path='/ai-chat' element={<AIChatPage/>} />
       {/* <Route path='/transactions' element={<ExpenseForm/>} /> */}
        <Route path='/create/expense' element={<CreateExpense/>} />
+       <Route path='/group/:id' element={<ViewGroup/>} />
+
     </Routes>
   )
 }
