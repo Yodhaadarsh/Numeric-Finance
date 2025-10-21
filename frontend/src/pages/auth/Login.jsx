@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
-import axios from "axios";
+import axios from "../../config/axios.config";
 // import axios from "../../config/axios.config";
 
 const LoginPage = () => {
@@ -30,7 +30,7 @@ const LoginPage = () => {
 
     // Simulate API call delay
     try {
-      let res = await axios.post("http://localhost:3000/auth/login" , form , {withCredentials:true});
+      let res = await axios.post("/auth/login" , form , {withCredentials:true});
       console.log(res.data);
       setLoading(false)
       navigate("/");

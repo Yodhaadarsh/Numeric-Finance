@@ -26,7 +26,7 @@ const RegisterPage = () => {
     }
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:3000/auth/register", form);
+      const res = await axios.post("/auth/register", form);
       console.log(res.data);
       setLoading(false);
       navigate("/")
