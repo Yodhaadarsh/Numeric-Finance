@@ -10,20 +10,15 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    fullname: {
-      fristname: {
-        type: String,
-        required: true,
-      },
-      lastname: {
-        type: String,
-      },
-    },
+   name:{
+    type:String,
+    required:true
+   },
     password: {
       type: String,
       required: true,
     },
-    groups: [{ type: mongoose.Schema.Types.ObjectId, ref: "Group" }]
+    groups: [{ type: mongoose.Schema.Types.ObjectId, ref: "Group" }],
   },
   { timestamps: true }
 );

@@ -29,16 +29,32 @@ const expenseTrackerSchema = new mongoose.Schema(
     },
     totalExpenses: {
       type: Number,
-      required: true,
+      // required: true,
     },
     savings: {
       type: Number,
-      required: true,
+      // required: true,
+    },
+    role:{
+       type: String,
+      enum: ["user", "model", "system"],
+      default: "user",
+    },
+    content:{
+      type:String
     },
     date:{
       type: Date,
        default: Date.now,
       required: true,
+    },
+    year:{
+      type:String,
+      required:true
+    },
+    month:{
+      type:String,
+      required:true
     }
     
   },

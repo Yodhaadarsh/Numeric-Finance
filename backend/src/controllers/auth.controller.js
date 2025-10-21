@@ -7,9 +7,11 @@ const registerController = async (req, res) => {
   let {
     userId,
     email,
-    fullname: { fristname, lastname },
+    name,
     password,
   } = req.body;
+
+  console.log(req.body);
 
   try {
     const user = await userModel.findOne({ email });
@@ -26,10 +28,7 @@ const registerController = async (req, res) => {
     const newuser = await usermodel.create({
       email,
       userId: userId,
-      fullname: {
-        fristname,
-        lastname,
-      },
+      name,
       password: hashedPassword,
     });
 
@@ -37,7 +36,13 @@ const registerController = async (req, res) => {
       { id: newuser._id, email: newuser.email },
       process.env.JWT_SECRET
     );
-    res.cookie("token", token);
+    res.cookie("token", token, {
+      httpOnly: true, // 🔒 safer, JS cannot access
+      secure: false, // ❌ false for localhost, ✅ true only on HTTPS/production
+      sameSite: "lax", // ✅ allow cross-origin cookies for localhost
+      path: "/", // ✅ make cookie available everywhere
+      maxAge: 7 * 24 * 60 * 60 * 1000, // ✅ 7 days persistence
+    });
 
     res.json({
       message: "User created sucessfully",
@@ -70,7 +75,13 @@ const loginController = async (req, res) => {
       process.env.JWT_SECRET
     );
 
-    res.cookie("token", token);
+    res.cookie("token", token, {
+      httpOnly: true, // 🔒 safer, JS cannot access
+      secure: false, // ❌ false for localhost, ✅ true only on HTTPS/production
+      sameSite: "lax", // ✅ allow cross-origin cookies for localhost
+      path: "/", // ✅ make cookie available everywhere
+      maxAge: 7 * 24 * 60 * 60 * 1000, // ✅ 7 days persistence
+    });
 
     res.status(200).json({
       message: "User logged in sucessfully",

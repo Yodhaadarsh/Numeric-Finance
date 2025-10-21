@@ -2,11 +2,20 @@ const ExpenseTrackerModel = require("../models/expense.tracker.model");
 const GroupModel = require("../models/groups.model");
 
 const createExpenseEntry = async (req, res) => {
-  const { user, income, education, medicine, grocery, others, savings } =
+  const { income, education, medicine, grocery, others, year, month } =
     req.body;
 
-  if (!income) {
+  if (!income || !month || !year) {
     return res.status(400).json({ message: "Income is required" });
+  }
+
+  const expense = await ExpenseTrackerModel.findOne({
+    month,
+    year,
+  });
+
+  if (expense) {
+    return res.send("already have a expense of same month and year");
   }
 
   try {
@@ -34,7 +43,10 @@ const createExpenseEntry = async (req, res) => {
       others,
       totalExpenses,
       savings,
+      month,
+      year,
     });
+
     res
       .status(201)
       .json({ message: "Expense entry created successfully", newExpenseEntry });
@@ -92,7 +104,7 @@ const groupExpenseEntry = async (req, res) => {
       expensesId: newExpenseEntry._id,
       userId: req.user._id,
     });
-    
+
     await group.save();
 
     res.status(201).json({

@@ -1,14 +1,21 @@
 const { Server } = require("socket.io");
 const cookie = require("cookie");
-const { generateText } = require("./ai.service");
+const { generateText, AiChat } = require("./ai.service");
 const jwt = require("jsonwebtoken");
 const userModel = require("../models/user.model");
+const ExpenseTracker = require("../models/expense.tracker.model");
 
-const userSocketMap = new Map();
-let io;
+// const userSocketMap = new Map();
+// let io;
 
 const initSocketServer = async (httpServer) => {
-  const io = new Server(httpServer, {});
+  const io = new Server(httpServer, {
+    cors: {
+      origin: "http://localhost:5173",
+      methods: ["GET", "POST"],
+      credentials: true,
+    },
+  });
 
   // Middleware for authentication
   io.use(async (socket, next) => {
@@ -35,15 +42,37 @@ const initSocketServer = async (httpServer) => {
   io.on("connection", (socket) => {
     console.log(`New client connected: ${socket.id}`);
 
-    // ai-message event listener
-    socket.on("ai-message", async (data) => {
-      let response = await generateText(data);
-      console.log(data);
+    // Listen for "send-data" from frontend
+    socket.on("send-data", async (data) => {
+      console.log("Data received from frontend:", data);
 
-      socket.emit("ai-response", {
-        message: response,
-      });
+      // Example: process data and send back
+
+      // const response = `Received your data: ${JSON.stringify(data)}`;
+      const response = await generateText(`${JSON.stringify(data)}`);
+
+
+      socket.emit("receive-data", response);
     });
+
+
+    socket.on("user-message" , async (data) => {
+      console.log(`Data recieved from frontend : ${data}`);
+
+
+      const response = await AiChat(data);
+
+
+      socket.emit("ai-message" ,  response);
+
+
+    })
+
+    socket.on("disconnect", () => {
+      console.log("🔴 User disconnected:", socket.id);
+    });
+
+   
   });
 };
 
