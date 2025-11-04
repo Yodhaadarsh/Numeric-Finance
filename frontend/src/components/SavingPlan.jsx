@@ -1,55 +1,89 @@
 import React from "react";
-import { ArrowUp, ArrowDown, Shield } from "lucide-react";
+import { ArrowRight, Calendar, Tag } from "lucide-react";
 
-const SavingPlanSimple = () => {
-  // Fake data
-  const currentSavings = 2100;
-  const lastMonthSavings = 1800;
-  const targetSavings = 5000;
-  const difference = currentSavings - lastMonthSavings;
-  const isPositive = difference >= 0;
-  const formattedDifference = Math.abs(difference).toLocaleString("en-US", { style: "currency", currency: "USD" });
-  const progressPercent = Math.min((currentSavings / targetSavings) * 100, 100);
+const LatestExpensePreview = ({ expenses = [] }) => {
+  // ---- Fake Data for Demo ----
+  const demoExpenses =
+    expenses.length > 0
+      ? expenses
+      : [
+          {
+            title: "Groceries at SuperMart",
+            amount: 1500,
+            date: "2025-11-03",
+            category: "Food",
+          },
+          {
+            title: "Netflix Subscription",
+            amount: 499,
+            date: "2025-11-02",
+            category: "Entertainment",
+          },
+          {
+            title: "Medical Bill",
+            amount: 1200,
+            date: "2025-11-01",
+            category: "Health",
+          },
+          {
+            title: "Tuition Fees",
+            amount: 3000,
+            date: "2025-10-31",
+            category: "Education",
+          },
+        ];
+
+  // ---- Limit to 3–4 most recent ----
+  const latest = demoExpenses.slice(0, 4);
 
   return (
-    <div className="bg-teal-800 text-white rounded-lg p-6 shadow-lg w-full max-w-md">
-      {/* Title */}
-      <h3 className="text-lg font-semibold text-gray-200 flex items-center space-x-2">
-        <Shield className="w-5 h-5 text-green-400" />
-        <span>My Saving Plan for Future</span>
-      </h3>
-
-      {/* Savings Info */}
-      <div className="mt-3 flex items-center justify-between">
-        <span className="text-3xl font-bold">
-          {currentSavings.toLocaleString("en-US", { style: "currency", currency: "USD" })}
-        </span>
-        <span className={`flex items-center text-sm font-medium ${isPositive ? "text-green-400" : "text-red-400"}`}>
-          {isPositive ? <ArrowUp className="w-4 h-4 mr-1" /> : <ArrowDown className="w-4 h-4 mr-1" />}
-          {formattedDifference} {isPositive ? "up" : "down"} from last month
-        </span>
+    <div className="bg-[#0f172a] text-gray-100 p-6 rounded-2xl shadow-xl border border-gray-700 w-full transition-all duration-300">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-5">
+        <h2 className="text-xl font-semibold text-indigo-400">
+          Latest Expenses
+        </h2>
+        <button className="flex items-center gap-2 text-sm text-indigo-400 hover:text-indigo-300 transition-colors">
+          View All <ArrowRight size={16} />
+        </button>
       </div>
 
-      {/* Progress Bar */}
-      <div className="mt-4 bg-teal-700 rounded-full h-3 w-full">
-        <div
-          className="bg-green-400 h-3 rounded-full transition-all"
-          style={{ width: `${progressPercent}%` }}
-        ></div>
-      </div>
-      <p className="mt-1 text-gray-200 text-sm">
-        {progressPercent.toFixed(1)}% of your target savings (${targetSavings.toLocaleString()}) achieved
-      </p>
+      {/* Expense Cards */}
+      <div className="space-y-4">
+        {latest.map((expense, i) => (
+          <div
+            key={i}
+            className="bg-[#1e293b] hover:bg-[#243047] rounded-xl p-4 flex justify-between items-start shadow-md border border-gray-700/60 transition-all duration-200"
+          >
+            <div className="flex flex-col">
+              <h3 className="font-medium text-gray-200">
+                {expense.title}
+              </h3>
+              <div className="flex items-center text-xs text-gray-400 mt-1 space-x-2">
+                <div className="flex items-center gap-1">
+                  <Calendar size={12} /> <span>{expense.date}</span>
+                </div>
+                <span>•</span>
+                <div className="flex items-center gap-1">
+                  <Tag size={12} /> <span>{expense.category}</span>
+                </div>
+              </div>
+              <p className="text-xs mt-3 text-emerald-400 italic">
+                💡 Looks like you spent ₹{expense.amount} on{" "}
+                {expense.category.toLowerCase()}, consider weekly budgeting.
+              </p>
+            </div>
 
-      {/* Safe Investment Info */}
-      <div className="mt-4 bg-teal-900 rounded-md p-3 flex items-center space-x-2">
-        <Shield className="w-5 h-5 text-yellow-400" />
-        <p className="text-sm text-gray-100">
-          Safe Investment: Consider low-risk options to secure your savings for future goals.
-        </p>
+            <div className="text-right">
+              <p className="text-lg font-semibold text-indigo-400">
+                ₹{expense.amount}
+              </p>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
 };
 
-export default SavingPlanSimple;
+export default LatestExpensePreview;

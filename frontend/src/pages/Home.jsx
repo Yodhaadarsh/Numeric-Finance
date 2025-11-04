@@ -6,20 +6,23 @@ import SavingPlan from '../components/SavingPlan'
 import OverviewGraph from '../components/Overview'
 import DashboardOptionalSections from '../components/Groups'
 import Footer from '../components/Footer'
+import Dashboard from '../components/Dashboard'
 
 const Home = () => {
   return (
     <div className='w-full mt-10'>
-      <Banner/>
-      <div className="flex gap-04 mt-6 flex-col">
+       <Dashboard/>
+      {/* <Banner/> */}
+      <div className=" gap-04 mt-6 flex-col">
         <AccountBalance/>
         <FinanceDashboard/>
       </div>
-      <div className="flex gap-4 ">
+      <div className=" flex flex-col gap-4 ">
         <SavingPlan/>
+        
       <OverviewGraph/> 
       </div>
-      <DashboardOptionalSections/>
+      <div className='mt-5'><DashboardOptionalSections/></div>
       <Footer/>
     </div>
   )

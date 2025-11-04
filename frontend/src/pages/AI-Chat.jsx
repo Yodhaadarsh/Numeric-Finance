@@ -18,6 +18,7 @@ const AIChatPage = () => {
   useEffect(() => {
     const handleAIMessage = (data) => {
       setMessages((prev) => [...prev, { type: "ai", text: data }]);
+      console.log(data);
       setIsTyping(false);
     };
 

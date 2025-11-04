@@ -7,7 +7,7 @@ const expenseTrackerSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    groupId:{
+    groupId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Group",
     },
@@ -35,28 +35,31 @@ const expenseTrackerSchema = new mongoose.Schema(
       type: Number,
       // required: true,
     },
-    role:{
-       type: String,
+    role: {
+      type: String,
       enum: ["user", "model", "system"],
       default: "user",
     },
-    content:{
-      type:String
+    content: {
+      type: String,
     },
-    date:{
+    date: {
       type: Date,
-       default: Date.now,
+      default: Date.now,
       required: true,
     },
-    year:{
-      type:String,
-      required:true
+    year: {
+      type: String,
+      required: true,
     },
-    month:{
-      type:String,
-      required:true
-    }
-    
+    month: {
+      type: String,
+      required: true,
+    },
+    aiSuggest: {
+      type: String,
+      required: true,
+    },
   },
   { timeseriestamps: true }
 );

@@ -3,7 +3,7 @@ import { Loader2 } from "lucide-react";
 import axios from "../config/axios.config";
 import socket from "../config/socket";
 import AiMessage from "../components/AiMessage";
-
+import { useNavigate } from "react-router-dom";
 
 const CreateExpense = () => {
   const [formData, setFormData] = useState({
@@ -16,6 +16,7 @@ const CreateExpense = () => {
     month: "",
   });
 
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
   const months = [
@@ -42,12 +43,15 @@ const CreateExpense = () => {
 
   useEffect(() => {
     // When receiving a message
+    // setLoading(true)
     socket.on("receive-data", (data) => {
-    try {
-      console.log(data);
-    } catch (error) {
-      console.log(error);
-    }
+      try {
+       setLoading(false)
+        console.log(data);
+      } catch (error) {
+        console.log(error);
+        setLoading(false)
+      }
     });
 
     return () => {
@@ -60,15 +64,21 @@ const CreateExpense = () => {
 
     // socket
 
-    
-
     // Simulate API call
 
     setLoading(true);
     try {
-      let res = await axios.post("/expense/create", formData);
-      console.log(res.data);
-      socket.emit("send-data", { formData });
+      // let res = await axios.post("/expense/create", formData);
+      // console.log(res.data);
+      socket.emit("send-data", {
+        income: formData.income,
+        education: formData.education,
+        medicine: formData.medicine,
+        grocery: formData.grocery,
+        others: formData.others,
+        year: formData.year,
+        month: formData.month,
+      });
       setLoading(false);
     } catch (error) {
       console.log(error);

@@ -3,10 +3,11 @@ const cookie = require("cookie");
 const { generateText, AiChat } = require("./ai.service");
 const jwt = require("jsonwebtoken");
 const userModel = require("../models/user.model");
-const ExpenseTracker = require("../models/expense.tracker.model");
+const ExpenseTrackerModel = require("../models/expense.tracker.model");
 const {
   sendMessageController,
 } = require("../controllers/groupChat.controller");
+const AiMessagesModel = require("../models/aiMessages.Model");
 
 // const userSocketMap = new Map();
 // let io;
@@ -46,30 +47,67 @@ const initSocketServer = async (httpServer) => {
     console.log(`New client connected: ${socket.id}`);
 
     // Listen for "send-data" from frontend
+    // for create a new expense with ai-suggestion
     socket.on("send-data", async (data) => {
       console.log("Data received from frontend:", data);
 
       // Example: process data and send back
 
       // const response = `Received your data: ${JSON.stringify(data)}`;
-      const response = await generateText(`${JSON.stringify(data)}`);
+      try {
+        const response = await generateText(`${JSON.stringify(data)}`);
+        const newExpense = await ExpenseTrackerModel.create({
+          user: socket.user._id,
+          income: data.income,
+          education: data.education,
+          medicine: data.medicine,
+          grocery: data.grocery,
+          others: data.others,
+          year: data.year,
+          month: data.month,
+          aiSuggest: response,
+        });
+        // console.log(newExpense);
 
-      socket.emit("receive-data", response);
+        socket.emit("receive-data", newExpense);
+      } catch (error) {
+        console.log(error);
+      }
     });
 
+    // for chat with ai
     socket.on("user-message", async (data) => {
       console.log(`Data recieved from frontend : ${data}`);
 
-      const response = await AiChat(data);
+      const msg = await AiMessagesModel.create({
+        text: data,
+        type: "user",
+        user: socket.user._id,
+      });
+
+      console.log(msg);
+      const allMessages = await AiMessagesModel.find();
+
+      const response = await AiChat(allMessages);
+
+      const aiResponse = await AiMessagesModel.create({
+        text: response,
+        type: "ai",
+        user: socket.user._id,
+      });
+
+      // console.log(response);
 
       socket.emit("ai-message", response);
     });
 
+    // for chat in the group
     socket.on("joinGroup", async (groupid) => {
       socket.join(groupid);
       console.log(`User joined group: ${groupid}`);
     });
 
+    // for chat in group
     socket.on("sendMessage", async ({ id, message }) => {
       await sendMessageController(socket.user._id, id, message, io);
 

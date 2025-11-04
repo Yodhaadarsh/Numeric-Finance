@@ -1,119 +1,159 @@
-import React, { useState } from "react";
-import { ArrowUp, ArrowDown, Plus, Edit } from "lucide-react";
+import React, { useMemo } from "react";
+import { Pie, Bar } from "react-chartjs-2";
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
+  Chart as ChartJS,
+  ArcElement,
   Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+  Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+} from "chart.js";
 
-const AccountBalanceDashboard = () => {
-  // Fake data
-  const [monthlyData, setMonthlyData] = useState([
-    { month: "Apr", balance: 5000 },
-    { month: "May", balance: 5200 },
-    { month: "Jun", balance: 5100 },
-    { month: "Jul", balance: 5400 },
-    { month: "Aug", balance: 5600 },
-    { month: "Sep", balance: 5800 },
-  ]);
+ChartJS.register(
+  ArcElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title
+);
 
-  const balance = monthlyData[monthlyData.length - 1].balance;
-  const lastMonthBalance = monthlyData[monthlyData.length - 2].balance;
-  const difference = balance - lastMonthBalance;
-  const isPositive = difference >= 0;
-  const formattedDifference = Math.abs(difference).toLocaleString("en-US", {
-    style: "currency",
-    currency: "USD",
-  });
+const ExpenseVisualization = ({ expenses = [] }) => {
+  // ---- Fake Data for Demo ----
+  const demoExpenses = useMemo(
+    () =>
+      expenses.length
+        ? expenses
+        : [
+            { category: "Grocery", amount: 2500 },
+            { category: "Rent", amount: 3500 },
+            { category: "Entertainment", amount: 1500 },
+            { category: "Education", amount: 1000 },
+            { category: "Medicine", amount: 1200 },
+          ],
+    [expenses]
+  );
 
-  // Handlers for fake add/update
-  const handleAddNew = () => {
-    const newMonth = `Month${monthlyData.length + 1}`;
-    const newBalance = balance + Math.floor(Math.random() * 500);
-    setMonthlyData([...monthlyData, { month: newMonth, balance: newBalance }]);
+  // ---- Calculate Category Totals ----
+  const categoryTotals = useMemo(() => {
+    return demoExpenses.reduce((acc, e) => {
+      acc[e.category] = (acc[e.category] || 0) + e.amount;
+      return acc;
+    }, {});
+  }, [demoExpenses]);
+
+  const categories = Object.keys(categoryTotals);
+  const totals = Object.values(categoryTotals);
+
+  // ---- Pie Chart Data ----
+  const pieData = {
+    labels: categories,
+    datasets: [
+      {
+        data: totals,
+        backgroundColor: [
+          "#60a5fa",
+          "#34d399",
+          "#f472b6",
+          "#fbbf24",
+          "#a78bfa",
+          "#fb7185",
+        ],
+        borderWidth: 2,
+        borderColor: "#1e1e1e",
+      },
+    ],
   };
 
-  const handleUpdate = () => {
-    const updatedData = monthlyData.map((item, idx) =>
-      idx === monthlyData.length - 1
-        ? { ...item, balance: item.balance + Math.floor(Math.random() * 300 - 150) }
-        : item
-    );
-    setMonthlyData(updatedData);
+  // ---- Bar Chart Data (Fake Trend) ----
+  const barData = {
+    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+    datasets: [
+      {
+        label: "Total Expense (₹)",
+        data: [5000, 7500, 6800, 7200, 6500, 7900],
+        backgroundColor: "#6366f1",
+        borderRadius: 10,
+      },
+    ],
   };
+
+  // ---- AI Summary ----
+  const aiSummary = useMemo(() => {
+    const sorted = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1]);
+    const top3 = sorted.slice(0, 3).map(([cat]) => cat);
+    if (top3.length < 3) return "Not enough data for insights.";
+    return `Your top 3 expense categories are ${top3.join(", ")}. 
+Try cutting down on ${top3[2]} by 15% to hit your savings goal 🎯.`;
+  }, [categoryTotals]);
 
   return (
-    <div className="btext-white rounded-xl  p-6 shadow-lg shadow-slate-800   ">
-      {/* Title */}
-      <h3 className="text-lg font-semibold text-gray-300">Account Balance</h3>
+    <div className="p-6 w-full transition-colors duration-500 bg-white dark:bg-[#0f172a] text-gray-900 dark:text-gray-100">
+      <h1 className="text-2xl font-bold mb-6 text-indigo-700 dark:text-indigo-400">
+        Expense Overview
+      </h1>
 
-      {/* Balance & Trend */}
-      <div className="mt-2 flex items-center justify-between">
-        <span className="text-3xl font-bold">
-          {balance.toLocaleString("en-US", { style: "currency", currency: "USD" })}
-        </span>
-        <span
-          className={`flex items-center text-sm font-medium ${
-            isPositive ? "text-green-400" : "text-red-400"
-          }`}
-        >
-          {isPositive ? <ArrowUp className="w-4 h-4 mr-1" /> : <ArrowDown className="w-4 h-4 mr-1" />}
-          {formattedDifference} {isPositive ? "up" : "down"} from last month
-        </span>
-      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* ---- Pie Chart ---- */}
+        <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900/40 dark:to-indigo-800/30 shadow-lg rounded-2xl p-4">
+          <h2 className="font-semibold text-lg mb-2 text-indigo-800 dark:text-indigo-300">
+            Expense Breakdown
+          </h2>
+          <Pie
+            data={pieData}
+            options={{
+              plugins: {
+                legend: {
+                  labels: {
+                    color: "#e5e7eb",
+                  },
+                },
+              },
+            }}
+          />
+        </div>
 
-      {/* Description */}
-      <p className="mt-2 text-gray-300 text-sm">
-        Your financial summary shows the comparison with last month's account balance.
-      </p>
+        {/* ---- Bar Chart ---- */}
+        <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/40 dark:to-blue-800/30 shadow-lg rounded-2xl p-4">
+          <h2 className="font-semibold text-lg mb-2 text-blue-800 dark:text-blue-300">
+            Monthly Expense Trend
+          </h2>
+          <Bar
+            data={barData}
+            options={{
+              responsive: true,
+              plugins: {
+                legend: { display: false },
+              },
+              scales: {
+                x: {
+                  ticks: { color: "#e5e7eb" },
+                  grid: { color: "#1e293b" },
+                },
+                y: {
+                  ticks: { color: "#e5e7eb" },
+                  grid: { color: "#1e293b" },
+                },
+              },
+            }}
+          />
+        </div>
 
-      {/* Graph */}
-      <div className="mt-4 w-full h-40">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={monthlyData}>
-            <XAxis dataKey="month" stroke="#cbd5e0" />
-            <YAxis stroke="#cbd5e0" />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "#1e293b",
-                border: "none",
-                borderRadius: "6px",
-                color: "#fff",
-              }}
-            />
-            <Line
-              type="monotone"
-              dataKey="balance"
-              stroke="#6366f1"
-              strokeWidth={3}
-              dot={{ r: 4 }}
-              activeDot={{ r: 6 }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* Buttons */}
-      <div className="mt-4 flex space-x-3">
-        <button
-          onClick={handleAddNew}
-          className="flex items-center bg-green-500 hover:bg-green-600 px-3 py-2 rounded-md shadow text-white text-sm font-semibold transition-all"
-        >
-          <Plus className="w-4 h-4 mr-1" /> Add New
-        </button>
-
-        <button
-          onClick={handleUpdate}
-          className="flex items-center bg-blue-500 hover:bg-blue-600 px-3 py-2 rounded-md shadow text-white text-sm font-semibold transition-all"
-        >
-          <Edit className="w-4 h-4 mr-1" /> Update
-        </button>
+        {/* ---- AI Summary ---- */}
+        <div className="bg-gradient-to-br from-emerald-50 to-green-100 dark:from-emerald-900/40 dark:to-green-800/30 shadow-lg rounded-2xl p-5 flex flex-col justify-center">
+          <h2 className="font-semibold text-lg mb-3 text-emerald-800 dark:text-emerald-300">
+            AI Expense Insights 💡
+          </h2>
+          <p className="text-gray-700 dark:text-gray-200 text-sm whitespace-pre-line">
+            {aiSummary}
+          </p>
+        </div>
       </div>
     </div>
   );
 };
 
-export default AccountBalanceDashboard;
+export default ExpenseVisualization;

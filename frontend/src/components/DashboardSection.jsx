@@ -7,15 +7,9 @@ import {
   Percent,
   Calendar,
   Sparkles,
-  User,
 } from "lucide-react";
 
 export default function TopSummary() {
-  // Mock data
-  const user = {
-    name: "Prince",
-  };
-
   const data = {
     income: 85000,
     expense: 63000,
@@ -59,21 +53,16 @@ export default function TopSummary() {
   ];
 
   return (
-    <section className="w-full bg-gradient-to-br from-gray-950 via-gray-900 to-black text-white py-10 px-6 md:px-12 rounded-sm shadow-lg border border-gray-800/60">
+    <section className="w-full bg-gradient-to-br from-gray-950 via-gray-900 to-black text-white py-10 px-6 md:px-12 rounded-3xl shadow-lg border border-gray-800/60">
       <div className="max-w-6xl mx-auto">
-        {/* Welcome Section */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mb-10 flex justify-between items-center"
-        >
+        {/* Title */}
+        <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-4xl font-extrabold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-              Welcome back, {user.name} 👋
-            </h1>
-            <p className="text-gray-400 text-sm mt-2">
-              Here's a quick summary of your financial month.
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+              Financial Overview
+            </h2>
+            <p className="text-gray-400 text-sm mt-1">
+              Here’s how you’re doing this month
             </p>
           </div>
 
@@ -81,12 +70,12 @@ export default function TopSummary() {
             whileHover={{ scale: 1.05 }}
             className="hidden md:flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 rounded-xl shadow-md cursor-pointer"
           >
-            <User size={18} />
-            <span className="text-sm font-medium">{user.name}</span>
+            <Sparkles size={18} />
+            <span className="text-sm font-medium">AI Suggest</span>
           </motion.div>
-        </motion.div>
+        </div>
 
-        {/* Cards Section */}
+        {/* Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
           {cards.map((card, i) => (
             <motion.div
@@ -118,7 +107,7 @@ export default function TopSummary() {
           ))}
         </div>
 
-        {/* AI Tip Box */}
+        {/* AI Tip */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

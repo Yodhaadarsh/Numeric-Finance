@@ -21,24 +21,24 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
 
-    if(!form.email || !form.password){
-      return
+    if (!form.email || !form.password) {
+      return;
     }
     setLoading(true);
 
     // Simulate API call delay
     try {
-      let res = await axios.post("/auth/login" , form , {withCredentials:true});
+      let res = await axios.post("/auth/login", form, {
+        withCredentials: true,
+      });
       console.log(res.data);
-      setLoading(false)
+      setLoading(false);
       navigate("/");
     } catch (error) {
       console.log(error);
-      setLoading(false)
+      setLoading(false);
     }
-   
   };
 
   return (
@@ -103,6 +103,9 @@ const LoginPage = () => {
             )}
           </button>
 
+         <div className="w-full flex text-right  ">
+           <NavLink className="text-xs text-right  w-full text-blue-600 ">Forgot password ?</NavLink>
+         </div>
           {/* Extra links */}
           <p className="text-center text-gray-400 text-sm mt-4">
             Don't have an account?{" "}

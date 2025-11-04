@@ -1,132 +1,128 @@
 import React, { useState } from "react";
-import { Plus, Edit, ArrowUp, ArrowDown, DollarSign, CreditCard, PieChart } from "lucide-react";
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { MessageCircle, X, Send } from "lucide-react";
 
-// Generic Card Component
-const FinanceCard = ({ title, icon: Icon, initialData }) => {
-  const [monthlyData, setMonthlyData] = useState(initialData);
+const AIFinanceAssistant = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [input, setInput] = useState("");
+  const [messages, setMessages] = useState([
+    {
+      type: "ai",
+      text: "Hello! I’m Numeric Finance AI 🤖. Ask me anything about your expenses or investments.",
+    },
+  ]);
 
-  const value = monthlyData[monthlyData.length - 1].amount;
-  const lastMonthValue = monthlyData[monthlyData.length - 2]?.amount || value;
-  const difference = value - lastMonthValue;
-  const isPositive = difference >= 0;
-  const formattedDifference = Math.abs(difference).toLocaleString("en-US", {
-    style: "currency",
-    currency: "USD",
-  });
+  const handleSend = () => {
+    if (!input.trim()) return;
 
-  const handleAddNew = () => {
-    const newMonth = `Month${monthlyData.length + 1}`;
-    const newAmount = value + Math.floor(Math.random() * 500 - 200);
-    setMonthlyData([...monthlyData, { month: newMonth, amount: newAmount }]);
-  };
+    const newMessage = { type: "user", text: input };
+    setMessages((prev) => [...prev, newMessage]);
+    setInput("");
 
-  const handleUpdate = () => {
-    const updatedData = monthlyData.map((item, idx) =>
-      idx === monthlyData.length - 1
-        ? { ...item, amount: item.amount + Math.floor(Math.random() * 300 - 150) }
-        : item
-    );
-    setMonthlyData(updatedData);
+    // Fake AI response for demo
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          type: "ai",
+          text: "I'm analyzing your spending... Here's a quick insight: You spent 25% more on entertainment this month 🎬.",
+        },
+      ]);
+    }, 800);
   };
 
   return (
-    <div className="bg-gradient-to-r from-indigo-900 via-indigo-800 to-indigo-900 text-white rounded-lg p-5 shadow-lg w-full max-w-sm">
-      {/* Title */}
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-300">{title}</h3>
-        <Icon className="w-5 h-5 text-indigo-400" />
-      </div>
+    <>
+      {/* Floating Chat Bubble */}
+      <button
+        onClick={() => setIsOpen(true)}
+        className={`fixed bottom-6 right-6 bg-indigo-600 hover:bg-indigo-700 text-white p-4 rounded-full shadow-lg transition-all duration-300 ${
+          isOpen ? "opacity-0 pointer-events-none" : "opacity-100"
+        }`}
+      >
+        <MessageCircle size={28} />
+      </button>
 
-      {/* Value & Trend */}
-      <div className="mt-2 flex items-center justify-between">
-        <span className="text-2xl font-bold">
-          {value.toLocaleString("en-US", { style: "currency", currency: "USD" })}
-        </span>
-        <span className={`flex items-center text-sm font-medium ${isPositive ? "text-green-400" : "text-red-400"}`}>
-          {isPositive ? <ArrowUp className="w-4 h-4 mr-1" /> : <ArrowDown className="w-4 h-4 mr-1" />}
-          {formattedDifference} {isPositive ? "up" : "down"} from last month
-        </span>
-      </div>
+      {/* Chat Panel */}
+      {isOpen && (
+        <div className="fixed bottom-6 right-6 w-80 sm:w-96 h-[500px] bg-[#0f172a] dark:bg-[#0f172a] text-gray-100 shadow-2xl rounded-2xl flex flex-col overflow-hidden border border-gray-700 transition-all duration-300">
+          {/* Header */}
+          <div className="flex justify-between items-center bg-indigo-700/40 px-4 py-3 border-b border-gray-700">
+            <h2 className="font-semibold text-lg text-indigo-300">
+              Numeric AI Assistant 💡
+            </h2>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="text-gray-300 hover:text-red-400 transition-colors"
+            >
+              <X size={22} />
+            </button>
+          </div>
 
-      {/* Description */}
-      <p className="mt-2 text-gray-300 text-sm">
-        {title} trend over the past months.
-      </p>
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
+            {messages.map((msg, index) => (
+              <div
+                key={index}
+                className={`flex ${
+                  msg.type === "ai" ? "justify-start" : "justify-end"
+                }`}
+              >
+                <div
+                  className={`max-w-[75%] px-4 py-2 rounded-2xl text-sm ${
+                    msg.type === "ai"
+                      ? "bg-indigo-800/40 text-gray-100"
+                      : "bg-indigo-600 text-white"
+                  }`}
+                >
+                  {msg.text}
+                </div>
+              </div>
+            ))}
+          </div>
 
-      {/* Graph */}
-      <div className="mt-4 w-full h-32">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={monthlyData}>
-            <XAxis dataKey="month" stroke="#cbd5e0" />
-            <YAxis stroke="#cbd5e0" />
-            <Tooltip
-              contentStyle={{ backgroundColor: "#1e293b", border: "none", borderRadius: "6px", color: "#fff" }}
+          {/* Example Prompts */}
+          <div className="px-4 py-3 border-t border-gray-700 bg-[#1e293b]/50">
+            <p className="text-xs text-gray-400 mb-2">
+              Try asking me:
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {[
+                "How can I save more this month?",
+                "Compare this month’s expenses with last month.",
+                "Rewrite my expenses in short summary.",
+              ].map((prompt, i) => (
+                <button
+                  key={i}
+                  onClick={() => setInput(prompt)}
+                  className="text-xs bg-indigo-800/40 hover:bg-indigo-700/50 text-gray-300 px-3 py-1 rounded-full transition-colors"
+                >
+                  {prompt}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Input Box */}
+          <div className="flex items-center border-t border-gray-700 bg-[#1e293b]/70 px-3 py-2">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Ask Numeric AI..."
+              className="flex-1 bg-transparent text-sm outline-none text-gray-200 placeholder-gray-500"
+              onKeyDown={(e) => e.key === "Enter" && handleSend()}
             />
-            <Line type="monotone" dataKey="amount" stroke="#6366f1" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* Buttons */}
-      <div className="mt-4 flex space-x-3">
-        <button
-          onClick={handleAddNew}
-          className="flex items-center bg-green-500 hover:bg-green-600 px-3 py-2 rounded-md shadow text-white text-sm font-semibold transition-all"
-        >
-          <Plus className="w-4 h-4 mr-1" /> Add New
-        </button>
-
-        <button
-          onClick={handleUpdate}
-          className="flex items-center bg-blue-500 hover:bg-blue-600 px-3 py-2 rounded-md shadow text-white text-sm font-semibold transition-all"
-        >
-          <Edit className="w-4 h-4 mr-1" /> Update
-        </button>
-      </div>
-    </div>
+            <button
+              onClick={handleSend}
+              className="ml-2 bg-indigo-600 hover:bg-indigo-700 p-2 rounded-full text-white transition-colors"
+            >
+              <Send size={18} />
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
-// Dashboard Example
-const FinanceDashboard = () => {
-  return (
-    <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-      <FinanceCard
-        title="Total Expenses"
-        icon={CreditCard}
-        initialData={[
-          { month: "Apr", amount: 2000 },
-          { month: "May", amount: 2500 },
-          { month: "Jun", amount: 2300 },
-          { month: "Jul", amount: 2700 },
-          { month: "Aug", amount: 3000 },
-        ]}
-      />
-      <FinanceCard
-        title="Total Savings"
-        icon={DollarSign}
-        initialData={[
-          { month: "Apr", amount: 5000 },
-          { month: "May", amount: 5200 },
-          { month: "Jun", amount: 5400 },
-          { month: "Jul", amount: 5600 },
-          { month: "Aug", amount: 5800 },
-        ]}
-      />
-      <FinanceCard
-        title="Where You Want to Invest"
-        icon={PieChart}
-        initialData={[
-          { month: "Apr", amount: 1000 },
-          { month: "May", amount: 1200 },
-          { month: "Jun", amount: 1500 },
-          { month: "Jul", amount: 1300 },
-          { month: "Aug", amount: 1600 },
-        ]}
-      />
-    </div>
-  );
-};
-
-export default FinanceDashboard;
+export default AIFinanceAssistant;
