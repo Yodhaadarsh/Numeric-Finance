@@ -255,8 +255,8 @@ Contributions are welcome!
 ## **Contact**
 
 **Prince** – Developer & Maintainer
-Email: [prince@example.com](mailto:prince@example.com)
-GitHub: [https://github.com/yourusername](https://github.com/yourusername)
+Email: yodhaadarsh@gmail.com
+GitHub: https://github.com/yodhaadarsh
 
 ---
 
