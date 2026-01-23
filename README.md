@@ -254,7 +254,7 @@ Contributions are welcome!
 
 ## **Contact**
 
-**Prince** – Developer & Maintainer
+**Adarsh** – Developer & Maintainer
 Email: yodhaadarsh@gmail.com
 GitHub: https://github.com/yodhaadarsh
 
